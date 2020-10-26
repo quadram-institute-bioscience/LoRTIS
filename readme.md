@@ -6,6 +6,7 @@ Run basecalling.sh. Downloads and runs guppy, takes a day or two for a typical N
 
 # 2. Demultiplex and trim the reads
 Run the preprocessing docker image (qcat, trim/flip reads)
+<b>Note: This typically takes 5-10 hours, most of this time is used by qcat</b>
 
 # 3. Bio-Tradis with Minimap2
 Run the new version of BioTradis with Minimap2
