@@ -1,4 +1,4 @@
-
+A complete workflow from Nanopore sequencing fast5 files through to Tradis plot files.
 
 
 # 1. Basecalling
