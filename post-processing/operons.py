@@ -7,24 +7,47 @@ gene2operon = dict()
 site2geneNamesPositive = dict() # For each site on the positive strand, keep a list of the genes which cover it
 site2geneNamesNegative = dict() # For each site on the positive strand, keep a list of the genes which cover it
 
+gene2start = dict()
+gene2end = dict()
+
+lengthOfPrimeRegion=50
 
 
-for record in SeqIO.parse("/home/martin/Downloads/cp009273.embl", "embl"):
+for record in SeqIO.parse("/home/martin/Quadram/bio-tradis-data/cp009273.embl", "embl"):
     print(record)
 
     features = record.features
     for feature in features:
         qualifiers = feature.qualifiers
+        location = feature.location
+        
+        locationStart = location.start
+        locationEnd = location.end
+        
         geneName = 'unknown'
 
+        isPrime=False
         geneNames = None
         if 'gene' in qualifiers.keys():
             geneNames = qualifiers['gene']
 
-        location = feature.location
-
+            for geneName in geneNames:
+                if location.strand==1:
+                    if '5prime' in geneName:
+                        locationStart = locationEnd-lengthOfPrimeRegion
+                    elif '3prime' in geneName:
+                        locationEnd = locationStart+lengthOfPrimeRegion
+                elif location.strand==-1:
+                    if '5prime' in geneName:
+                        locationEnd = locationStart+lengthOfPrimeRegion
+                    elif '3prime' in geneName:
+                        locationStart = locationEnd-lengthOfPrimeRegion
+                
+                gene2start[geneName] = locationStart
+                gene2end[geneName] = locationEnd
+                
         
-        for i in range(location.start,location.end):
+        for i in range(locationStart,locationEnd):
             if location.strand==1:
                 if i not in site2geneNamesPositive.keys(): site2geneNamesPositive[i] = set()
 
@@ -47,8 +70,9 @@ for record in SeqIO.parse("/home/martin/Downloads/cp009273.embl", "embl"):
 
 
 def outputOperons(site2geneNames1,site2geneNames2,strandName):
+    lastOperonEnd=0
     operonStart=0
-    operonGenes=set()
+    operonGenes=dict()
 
     for i in range(0,max(site2geneNames1.keys())):
         if i not in site2geneNames2.keys(): site2geneNames2[i] = set()
@@ -56,31 +80,92 @@ def outputOperons(site2geneNames1,site2geneNames2,strandName):
         if i in site2geneNames1.keys():
             geneNames = site2geneNames1[i]
 
-            if geneNames is None or len(geneNames)==0 or (site2geneNames2[i] is not None and len(site2geneNames2[i])>0): # Found the end of an operon?
-                if len(operonGenes)>0:
-                    print(strandName + ' operon start:' + str(operonStart) + ' end:' + str(i+1))
+            foundGeneNotPrime = False
+            for geneName in geneNames:
+                if 'prime' not in geneName:
+                    foundGeneNotPrime=True
+            
+            otherGeneNames = site2geneNames2[i]
 
-                    for operonGene in operonGenes:
-                        print('    gene:' + operonGene)
+            foundOtherGeneNotPrime = False
+            for otherGeneName in otherGeneNames:
+                if 'prime' not in otherGeneName:
+                    foundOtherGeneNotPrime=True
 
+            if geneNames is None or len(geneNames)==0 or (site2geneNames2[i] is not None and len(site2geneNames2[i])>0 and foundOtherGeneNotPrime==True and foundGeneNotPrime==True): # Found the end of an operon?
+                
+                if len(operonGenes.keys())>0:
+                    printedHeader=False
+                    genesAlreadySeen = set()
+                    sites = sorted(operonGenes.keys())
+
+                    seenGeneParts = set()
+                    allowedGeneNames = set()
+                    allowedGenes = set()
+                    for site in sites:
+                        operonGeneNames = operonGenes[site]
+                        for geneName in operonGeneNames:
+                            seenGeneParts.add(geneName)
+                            if '3prime' in geneName:
+                                allowedGeneNames.add(geneName[:-8])
+
+                    for allowedGeneName in allowedGeneNames:
+                        if allowedGeneName in seenGeneParts: # and allowedGeneName+'__3prime' in seenGeneParts and allowedGeneName+ '__5prime' in seenGeneParts:
+                            allowedGenes.add(allowedGeneName)
+                    
+                    
+                    for site in sites:
+                        operonGeneNames = operonGenes[site]
+                        for geneName in operonGeneNames:
+                            if geneName not in genesAlreadySeen and geneName in allowedGenes:
+                                if not printedHeader:
+                                    operonStart=9999999999999999
+                                    operonEnd=-1
+                                    for site in sites:
+                                        operonGeneNames = operonGenes[site]
+                                        for myGeneName in operonGeneNames:
+                                            if myGeneName + '__3prime' in gene2start.keys() and gene2start[myGeneName + '__3prime']<operonStart:operonStart=gene2start[myGeneName + '__3prime']
+                                            if myGeneName + '__5prime' in gene2start.keys() and gene2start[myGeneName + '__5prime']<operonStart:operonStart=gene2start[myGeneName + '__5prime']
+
+                                            if myGeneName + '__3prime' in gene2end.keys() and gene2end[myGeneName + '__3prime']>operonEnd:operonEnd=gene2end[myGeneName + '__3prime']
+                                            if myGeneName + '__5prime' in gene2end.keys() and gene2end[myGeneName + '__5prime']>operonEnd:operonEnd=gene2end[myGeneName + '__5prime']
+
+                                    print('\n\nOperon start:' + str(operonStart) + ' end:' + str(operonEnd))
+                                    lastOperonEnd = operonEnd
+                                    printedHeader=True
+
+                                if geneName + "__5prime" in gene2start.keys(): print(strandName + geneName + "__5prime [" + str(gene2start[geneName + "__5prime"]) + ":" + str(gene2end[geneName + "__5prime"]) + "]")
+                                print(strandName + geneName + " [" + str(gene2start[geneName]) + ":" + str(gene2end[geneName]) + "]")
+                                if geneName + "__3prime" in gene2start.keys(): print(strandName + geneName + "__3prime [" + str(gene2start[geneName + "__3prime"]) + ":" + str(gene2end[geneName + "__3prime"]) + "]")
+                                genesAlreadySeen.add(geneName)
+
+                    # if printedHeader: print('stop\n\n')
                     operonStart=i
-                    operonGenes=set()
+                    operonGenes=dict()
                 else:
                     operonStart = i
             else:
+                if i not in operonGenes.keys(): operonGenes[i] = set()
                 for geneName in geneNames:
-                    operonGenes.add(geneName)
+                    operonGenes[i].add(geneName)
 
     if max(site2geneNames1.keys()) - operonStart > 10:
-        print('Final operon start:' + str(operonStart) + ' end:' + str(max(site2geneNames1.keys())+1))
+        printedHeader=False
 
-        for operonGene in operonGenes:
-            print('    gene:' + operonGene)
+        genesAlreadySeen=set()
+        sites = sorted(operonGenes.keys())
+        for site in sites:
+            operonGeneNames = operonGenes[site]
+            if geneName not in genesAlreadySeen:
+                if not printedHeader:
+                    print('Final operon start:' + str(operonStart) + ' end:' + str(max(site2geneNames1.keys())+1))
+                    printedHeader=True
+                print(strandName + geneName + " [" + str(site) + "]")
+                genesAlreadySeen.add(geneName)
 
-
-
-
-outputOperons(site2geneNamesPositive,site2geneNamesNegative,'Positive')
-outputOperons(site2geneNamesNegative,site2geneNamesPositive,'Negative')
+        if printedHeader: print('stop\n\n')
+        
+outputOperons(site2geneNamesPositive,site2geneNamesNegative,'+')
+outputOperons(site2geneNamesNegative,site2geneNamesPositive,'-')
 
 
