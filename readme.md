@@ -13,3 +13,5 @@ Run the new version of BioTradis with Minimap2
 
 # 4. Explore the results
 Check plot files are correct, change the format e.g. second number is negative, launch Artemis, identify spikes and operons. Combine plot files e.g. different barcodes. Remove background noise (sites with 1 insertion set to 0).
+
+reduce-insertion-plot.py takes as input an insertion plot and the number of insertions that you would like to keep and makes a new plot file with .reduced on the end of the name
