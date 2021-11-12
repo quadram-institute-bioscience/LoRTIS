@@ -1,0 +1,73 @@
+# https://samtools.github.io/hts-specs/SAMv1.pdf 
+
+rule trim_short_reads:
+    input:
+        "work/short-reads.fq.gz"
+    output:
+        "work/trimmed-short-reads.fasta"
+    script:
+        "trim_by_tag_length.py work/short-reads.fq.gz 25 > work/trimmed-short-reads.fasta"
+
+rule trim_long_reads:
+    input:
+        "work/long-reads.fq.gz"
+    output:
+        "work/trimmed-long-reads.fasta"
+    script:
+        "trim_by_tag_length.py work/long-reads.fq.gz 92 > work/trimmed-long-reads.fasta"
+
+rule install_bwa:
+    output:
+        "bwa-mem2-2.0pre2_x64-linux/bwa-mem2"
+    shell:
+        "curl -L https://github.com/bwa-mem2/bwa-mem2/releases/download/v2.0pre2/bwa-mem2-2.0pre2_x64-linux.tar.bz2 | tar jxf -"
+
+rule map_short_reads:
+    input:
+        "bwa-mem2-2.0pre2_x64-linux/bwa-mem2",
+        "work/reference.fasta",
+        "work/trimmed-short-reads.fasta"
+    output:
+        "work/mapping.sam"
+    shell:
+        """
+        bwa-mem2-2.0pre2_x64-linux/bwa-mem2 index work/reference.fasta
+        bwa-mem2-2.0pre2_x64-linux/bwa-mem2 mem work/reference.fasta work/trimmed-reads.fasta > work/mapping.sam
+        """
+
+rule map_short_reads:
+    input:
+        "work/reference.fasta",
+        "work/trimmed-long-reads.fasta"
+    output:
+        "work/mapping.sam"
+    conda:
+        "minimap2.yml"
+    shell:
+        """
+        minimap2 -x map-ont -d reference work/reference.fasta > /dev/null 2>&1
+        minimap2 -c -a -o work/mapping.nonunique.sam -N 1 -x map-ont reference work/trimmed-long-reads.fasta
+        samtools view -bq 1 work/mapping.nonunique.sam > work/mapping.sam
+        """
+
+rule convert_sam_to_bam:
+    input:
+        "work/mapping.sam"
+    output:
+        "work/mapping.bam",
+        "work/unmapped.fa"
+    conda:
+        "samtools.yml"
+    shell:
+        """
+        samtools view -S -b Example/bwa.sam > Example/bwa.bam
+        samtools bam2fq Example/unmapped.bam | seqtk seq -A - > Example/unmapped.fa
+        """
+
+rule create_insertion_plot:
+    input:
+        "work/mapping.sam"
+    output:
+        "work/summary-stats.tsv"
+    script:
+        "sam_to_insert_plot.py work/mapping.sam work/reference.fasta"

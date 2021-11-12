@@ -1,0 +1,7 @@
+name: bio
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - samtools=1.14=hb421002_0
