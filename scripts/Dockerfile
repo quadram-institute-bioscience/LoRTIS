@@ -2,7 +2,7 @@
 FROM snakemake/snakemake:v5.7.4
 
 # Set the working directory, this lives in the container file system
-WORKDIR /
+WORKDIR /usr/src/app
 
 # Inform Docker that the container is listening on the specified port at runtime.
 EXPOSE 8080

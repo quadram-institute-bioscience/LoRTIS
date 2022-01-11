@@ -5,8 +5,8 @@ rule trim_short_reads:
         "/data/short-reads.fq.gz"
     output:
         "/data/trimmed-short-reads.fasta"
-    script:
-        "trim_by_tag_length.py /data/short-reads.fq.gz 10 > /data/trimmed-short-reads.fasta"
+    shell:
+        "python3 trim_by_tag_length.py /data/short-reads.fq.gz 10 > /data/trimmed-short-reads.fasta"
 
 rule trim_long_reads:
     input:
