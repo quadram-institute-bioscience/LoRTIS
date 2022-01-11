@@ -6,7 +6,7 @@ rule trim_short_reads:
     output:
         "trimmed-short-reads.fasta"
     script:
-        "trim_by_tag_length.py short-reads.fq.gz 25 > trimmed-short-reads.fasta"
+        "trim_by_tag_length.py short-reads.fq.gz 10 > trimmed-short-reads.fasta"
 
 rule trim_long_reads:
     input:
