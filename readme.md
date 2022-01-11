@@ -16,7 +16,13 @@ sudo docker login
 sudo docker build --tag lortis:1.0 .
 sudo docker tag lortis:1.0 martinclott/lortis:latest
 sudo docker push martinclott/lortis:latest
+sudo docker run --name lotris1 --mount source=excapevol,target=/data martinclott/lortis:latest
 </pre>
+
+
+sudo docker run --rm -v $PWD:/source -v lortisvol:/data -w /source alpine cp reference.fasta short-reads.fq.gz /data
+sudo docker run --name lotris6 --mount source=lortisvol,target=/data martinclott/lortis:latest
+
 short-reads.fq.gz
 
 reference.fasta
