@@ -3,6 +3,8 @@ import pysam
 
 from Bio import SeqIO
 
+print("To be completed, this doesn't output summary stats yet"
+
 filename = sys.argv[1]
 reference_filename = sys.argv[2]
 

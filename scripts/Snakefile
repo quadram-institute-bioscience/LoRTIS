@@ -2,19 +2,19 @@
 
 rule trim_short_reads:
     input:
-        "short-reads.fq.gz"
+        "/data/short-reads.fq.gz"
     output:
-        "trimmed-short-reads.fasta"
+        "/data/trimmed-short-reads.fasta"
     script:
-        "trim_by_tag_length.py short-reads.fq.gz 25 > trimmed-short-reads.fasta"
+        "trim_by_tag_length.py /data/short-reads.fq.gz 10 > /data/trimmed-short-reads.fasta"
 
 rule trim_long_reads:
     input:
-        "long-reads.fq.gz"
+        "/data/long-reads.fq.gz"
     output:
-        "trimmed-long-reads.fasta"
+        "/data/trimmed-long-reads.fasta"
     script:
-        "trim_by_tag_length.py long-reads.fq.gz 92 > trimmed-long-reads.fasta"
+        "trim_by_tag_length.py /data/long-reads.fq.gz 92 > /data/trimmed-long-reads.fasta"
 
 rule install_bwa:
     output:
@@ -25,51 +25,51 @@ rule install_bwa:
 rule map_short_reads:
     input:
         "bwa-mem2-2.0pre2_x64-linux/bwa-mem2",
-        "reference.fasta",
-        "trimmed-short-reads.fasta"
+        "/data/reference.fasta",
+        "/data/trimmed-short-reads.fasta"
     output:
-        "mapping.sam"
+        "/data/mapping.sam"
     shell:
         """
-        bwa-mem2-2.0pre2_x64-linux/bwa-mem2 index reference.fasta
-        bwa-mem2-2.0pre2_x64-linux/bwa-mem2 mem reference.fasta work/trimmed-reads.fasta > mapping.sam
+        bwa-mem2-2.0pre2_x64-linux/bwa-mem2 index /data/reference.fasta
+        bwa-mem2-2.0pre2_x64-linux/bwa-mem2 mem /data/reference.fasta /data/trimmed-short-reads.fasta > mapping.sam
         """
 
-rule map_short_reads:
+rule map_long_reads:
     input:
-        "reference.fasta",
-        "trimmed-long-reads.fasta"
+        "/data/reference.fasta",
+        "/data/trimmed-long-reads.fasta"
     output:
-        "mapping.sam"
+        "/data/mapping.sam"
     conda:
         "minimap2.yml"
     shell:
         """
-        minimap2 -x map-ont -d reference reference.fasta > /dev/null 2>&1
-        minimap2 -c -a -o mapping.nonunique.sam -N 1 -x map-ont reference trimmed-long-reads.fasta
-        samtools view -bq 1 mapping.nonunique.sam > mapping.sam
+        minimap2 -x map-ont -d reference /data/reference.fasta > /dev/null 2>&1
+        minimap2 -c -a -o /data/mapping.nonunique.sam -N 1 -x map-ont reference /data/trimmed-long-reads.fasta
+        samtools view -bq 1 /data/mapping.nonunique.sam > /data/mapping.sam
         """
 
 rule convert_sam_to_bam:
     input:
-        "mapping.sam"
+        "/data/mapping.sam"
     output:
-        "mapping.bam",
-        "unmapped.fa"
+        "/data/mapping.bam",
+        "/data/unmapped.fa"
     conda:
         "samtools.yml"
     shell:
         """
-        samtools view -S -b bwa.sam > bwa.bam
-        samtools view -f 4 bwa.bam > unmapped.sam
-        samtools view -S -b unmapped.sam > unmapped.bam
-        samtools bam2fq unmapped.bam | seqtk seq -A - > unmapped.fa
+        samtools view -S -b /data/mapping.sam > /data/mapping.bam
+        samtools view -f 4 /data/mapping.bam > /data/unmapped.sam
+        samtools view -S -b /data/unmapped.sam > /data/unmapped.bam
+        samtools bam2fq /data/unmapped.bam | seqtk seq -A - > /data/unmapped.fa
         """
 
 rule create_insertion_plot:
     input:
-        "mapping.sam"
+        "/data/mapping.sam"
     output:
-        "summary-stats.tsv"
+        "/data/summary-stats.tsv"
     script:
-        "sam_to_insert_plot.py mapping.sam reference.fasta"
+        "sam_to_insert_plot.py /data/mapping.sam /data/reference.fasta"

@@ -10,4 +10,4 @@ EXPOSE 8080
 # Copy the rest of your app's source code from your host to your image filesystem.
 COPY . .
 
-CMD snakemake --use-conda --use-singularity /summary-stats.tsv
+CMD snakemake --use-conda --use-singularity /data/summary-stats.tsv
