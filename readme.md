@@ -11,12 +11,12 @@ Run the preprocessing docker image (qcat, trim/flip reads)
 # 3. Bio-Tradis with Minimap2
 
 ## 3.1. Short reads
-
+<pre>
 sudo docker login
 sudo docker build --tag lortis:1.0 .
 sudo docker tag lortis:1.0 martinclott/lortis:latest
 sudo docker push martinclott/lortis:latest
-
+</pre>
 short-reads.fq.gz
 
 reference.fasta
