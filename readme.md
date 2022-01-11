@@ -14,6 +14,8 @@ Run the preprocessing docker image (qcat, trim/flip reads)
 short-reads.fq.gz
 reference.fasta
 
+singularity run lortis.sif
+
 
 
 # 4. Explore the results
