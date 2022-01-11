@@ -7,6 +7,9 @@ WORKDIR /usr/src/app
 # Inform Docker that the container is listening on the specified port at runtime.
 EXPOSE 8080
 
+RUN apt-get update
+RUN pip install biopython
+
 # Copy the rest of your app's source code from your host to your image filesystem.
 COPY . .
 
