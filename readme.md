@@ -12,9 +12,13 @@ Run the preprocessing docker image (qcat, trim/flip reads)
 
 ## 3.1. Short reads
 short-reads.fq.gz
+
 reference.fasta
 
+sudo singularity build lortis.sif Singularity.def
+
 singularity run lortis.sif
+
 
 
 
