@@ -1,24 +1,34 @@
-A complete workflow from Nanopore sequencing fast5 files through to Tradis plot files.
+LoRTIS: A complete workflow from Nanopore sequencing FAST5 files, or Illumina short read FASTQ files, through to Tradis insertion 
+plot files.
 
 
-# 1. Basecalling
-Run basecalling.sh. Downloads and runs guppy, takes a day or two for a typical Nanopore dataset.
+# Prerequiste: Download the repository
 
-# 2. Demultiplex and trim the reads
+<pre>
+git clone https://github.com/quadram-institute-bioscience/LoRTIS/
+</pre>
+
+
+# Example 1: Long read FASTQ data to transposon insertion plot.
+<pre>
+cd example
+sh long-reads.sh
+</pre>
+
+# Finally run Artemis
+
+# Optional: 1. Basecalling for Nanopore data
+This is performed using the Guppy basecaller, an example is provided in <b>pre-processing/basecalling.sh</b>
+
+# Optional: 2. Demultiplex and trim the reads for the transposon
+This uses QCat, which has been modified to search for the transposon sequence as listed in <b>simple_standard.yml</b>. The workflow can be run using pipeline.sh
+
 Run the preprocessing docker image (qcat, trim/flip reads)
 <b>Note: This typically takes 5-10 hours, most of this time is used by qcat</b>
 
 # 3. Bio-Tradis with Minimap2
 
 ## 3.1. Short reads
-<pre>
-sudo docker login
-sudo docker build --tag lortis:1.0 .
-sudo docker tag lortis:1.0 martinclott/lortis:latest
-sudo docker push martinclott/lortis:latest
-sudo docker run --name lotris1 --mount source=excapevol,target=/data martinclott/lortis:latest
-</pre>
-
 
 sudo docker run --rm -v $PWD:/source -v lortisvol:/data -w /source alpine cp reference.fasta short-reads.fq.gz /data
 sudo docker run --name lotris6 --mount source=lortisvol,target=/data martinclott/lortis:latest
