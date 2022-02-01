@@ -8,7 +8,8 @@ WORKDIR /usr/src/app
 EXPOSE 8080
 
 RUN apt-get update
-RUN pip install biopython
+RUN apt-get install -y curl
+RUN pip install biopython pysam
 
 # Copy the rest of your app's source code from your host to your image filesystem.
 COPY . .

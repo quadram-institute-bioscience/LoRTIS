@@ -3,8 +3,6 @@ import pysam
 
 from Bio import SeqIO
 
-print("To be completed, this doesn't output summary stats yet"
-
 filename = sys.argv[1]
 reference_filename = sys.argv[2]
 
@@ -105,8 +103,8 @@ for read in samfile:
 #            print(rc_position)
 #            print(read)
 
-print(max(forward_inserts.keys()))
-print(max(reverse_inserts.keys()))
+#print(max(forward_inserts.keys()))
+#print(max(reverse_inserts.keys()))
 
 insertion_sites_by_contig = dict()
 
@@ -135,25 +133,24 @@ for contig_name in forward_inserts_by_contig:
 
         insert_plot_file.write('\n')
 
-print("Output some stats here..\n")
-print("Total Reads : " + str(total_reads))
-print("Total Mapped : " + str(total_mapped))
-print("Percentage Mapped : " + str((100*total_mapped)/total_reads))
+print("Total Reads\t" + str(total_reads))
+print("Total Mapped\t" + str(total_mapped))
+print("Percentage Mapped\t" + str((100*total_mapped)/total_reads))
 
 total_uis=0
 total_contig_length=0
 for contig_name in insertion_sites_by_contig.keys():
-    print("Statistics for contig " + contig_name)
+    print("Statistics for contig\t" + contig_name)
     
-    print("Unique insertion sites " + str(insertion_sites_by_contig[contig_name]))
+    print("Unique insertion sites\t" + str(insertion_sites_by_contig[contig_name]))
     total_uis=total_uis+insertion_sites_by_contig[contig_name]
     
-    print("Contig length " + str(contig_name_to_size[contig_name]))
+    print("Contig length\t" + str(contig_name_to_size[contig_name]))
     total_contig_length=total_contig_length+contig_name_to_size[contig_name]
     
-    print("Contig length / UIS " + str(contig_name_to_size[contig_name]/insertion_sites_by_contig[contig_name]))
+    print("Contig length / UIS\t" + str(contig_name_to_size[contig_name]/insertion_sites_by_contig[contig_name]))
 
 print("\n\nGrand total")
-print("Total Unique insertion sites " + str(total_uis))
-print("Total contig lengths " + str(total_contig_length))
-print("Total contig length / UIS " + str(total_contig_length/total_uis))
+print("Total Unique insertion sites\t" + str(total_uis))
+print("Total contig lengths\t" + str(total_contig_length))
+print("Total contig length / UIS\t" + str(total_contig_length/total_uis))

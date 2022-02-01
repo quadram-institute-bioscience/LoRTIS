@@ -13,8 +13,8 @@ rule trim_long_reads:
         "/data/long-reads.fq.gz"
     output:
         "/data/trimmed-long-reads.fasta"
-    script:
-        "trim_by_tag_length.py /data/long-reads.fq.gz 92 > /data/trimmed-long-reads.fasta"
+    shell:
+        "python3 trim_by_tag_length.py /data/long-reads.fq.gz 92 > /data/trimmed-long-reads.fasta"
 
 rule install_bwa:
     output:
@@ -32,7 +32,7 @@ rule map_short_reads:
     shell:
         """
         bwa-mem2-2.0pre2_x64-linux/bwa-mem2 index /data/reference.fasta
-        bwa-mem2-2.0pre2_x64-linux/bwa-mem2 mem /data/reference.fasta /data/trimmed-short-reads.fasta > mapping.sam
+        bwa-mem2-2.0pre2_x64-linux/bwa-mem2 mem /data/reference.fasta /data/trimmed-short-reads.fasta > /data/mapping.sam
         """
 
 rule map_long_reads:
@@ -54,22 +54,26 @@ rule convert_sam_to_bam:
     input:
         "/data/mapping.sam"
     output:
-        "/data/mapping.bam",
+        "/data/mapping.sorted.bam",
         "/data/unmapped.fa"
     conda:
         "samtools.yml"
     shell:
         """
-        samtools view -S -b /data/mapping.sam > /data/mapping.bam
-        samtools view -f 4 /data/mapping.bam > /data/unmapped.sam
+        samtools sort  /data/mapping.sam -o /data/mapping.sorted.bam
+        samtools index /data/mapping.sorted.bam
+        samtools view -f 4 /data/mapping.sorted.bam > /data/unmapped.sam
         samtools view -S -b /data/unmapped.sam > /data/unmapped.bam
         samtools bam2fq /data/unmapped.bam | seqtk seq -A - > /data/unmapped.fa
         """
 
 rule create_insertion_plot:
     input:
-        "/data/mapping.sam"
+        "/data/unmapped.fa",
+        "/data/mapping.sorted.bam"
     output:
         "/data/summary-stats.tsv"
-    script:
-        "sam_to_insert_plot.py /data/mapping.sam /data/reference.fasta"
+    shell:
+        """
+        python3 sam_to_insert_plot.py /data/mapping.sorted.bam /data/reference.fasta > /data/summary-stats.tsv
+        """
