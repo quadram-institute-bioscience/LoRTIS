@@ -111,7 +111,7 @@ insertion_sites_by_contig = dict()
 for contig_name in forward_inserts_by_contig:
     if contig_name not in insertion_sites_by_contig.keys(): insertion_sites_by_contig[contig_name]=0
     
-    insert_plot_file = open(contig_name + '.insert_plot','w+')
+    insert_plot_file = open('/data/' + contig_name + '.insert_plot','w+')
     forward_inserts = forward_inserts_by_contig[contig_name]
     reverse_inserts = reverse_inserts_by_contig[contig_name]
                 

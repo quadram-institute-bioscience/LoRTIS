@@ -40,36 +40,46 @@ rule map_long_reads:
         "/data/reference.fasta",
         "/data/trimmed-long-reads.fasta"
     output:
-        "/data/mapping.sam"
+        "/data/mapping.bam"
     conda:
         "minimap2.yml"
     shell:
         """
         minimap2 -x map-ont -d reference /data/reference.fasta > /dev/null 2>&1
         minimap2 -c -a -o /data/mapping.nonunique.sam -N 1 -x map-ont reference /data/trimmed-long-reads.fasta
-        samtools view -bq 1 /data/mapping.nonunique.sam > /data/mapping.sam
+        samtools view -bq 1 /data/mapping.nonunique.sam > /data/mapping.bam
         """
+
 
 rule convert_sam_to_bam:
     input:
         "/data/mapping.sam"
     output:
-        "/data/mapping.sorted.bam",
-        "/data/unmapped.fa"
+        "/data/mapping.bam",
+    conda:
+        "samtools.yml"
+    shell:
+        "samtools view -S -b /data/mapping.sam > /data/mapping.bam"
+
+
+rule get_unmapped_reads:
+    input:
+        "/data/mapping.bam"
+    output:
+        "/data/mapping.sorted.bam"
     conda:
         "samtools.yml"
     shell:
         """
-        samtools sort  /data/mapping.sam -o /data/mapping.sorted.bam
+#        samtools view -f 4 /data/mapping.bam > /data/unmapped.sam
+#        samtools view -S -b /data/unmapped.sam > /data/unmapped.bam
+#        samtools bam2fq /data/unmapped.bam | seqtk seq -A - > /data/unmapped.fa
+        samtools sort  /data/mapping.bam -o /data/mapping.sorted.bam
         samtools index /data/mapping.sorted.bam
-        samtools view -f 4 /data/mapping.sorted.bam > /data/unmapped.sam
-        samtools view -S -b /data/unmapped.sam > /data/unmapped.bam
-        samtools bam2fq /data/unmapped.bam | seqtk seq -A - > /data/unmapped.fa
         """
 
 rule create_insertion_plot:
     input:
-        "/data/unmapped.fa",
         "/data/mapping.sorted.bam"
     output:
         "/data/summary-stats.tsv"

@@ -9,13 +9,25 @@ git clone https://github.com/quadram-institute-bioscience/LoRTIS/
 </pre>
 
 
-# Example 1: Long read FASTQ data to transposon insertion plot.
+## Example 1: Long read FASTQ data to transposon insertion plot.
 <pre>
 cd example
 sh long-reads.sh
+# Finally load the example.embl into Artemis and add user plot
 </pre>
 
-# Finally run Artemis
+This uses gzipped long read data in fastq format in a file called <b>long-reads.fq.gz</b>. Additionally, a reference genome in fasta format called <b>reference.fasta</b> is used to map the reads to. This example script will copy the input files into a Docker volume, run the workflow and then copy the results out into a directory called <b>results-lr</b>.
+
+The results can be viewed in Artemis with <b>File > Open</b> then select the reference.embl. Next, go to <b>Graph > Add User Plot</b> and select the relevant <b>.insert_plot</b> file.
+
+## Example 2: Short read FASTQ data to transposon insertion plot.
+<pre>
+cd example
+sh short-reads.sh
+# Finally load the example.embl into Artemis and add user plot
+</pre>
+
+The workflow proceeds as in example 1 but short read mapping software is used.
 
 # Optional: 1. Basecalling for Nanopore data
 This is performed using the Guppy basecaller, an example is provided in <b>pre-processing/basecalling.sh</b>
