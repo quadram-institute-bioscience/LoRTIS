@@ -8,11 +8,11 @@ import sys
 from subprocess import Popen, PIPE, STDOUT
 from io import StringIO
 
-#filename = sys.argv[1]
+filename = sys.argv[1]
 shred_length=75
 
-with open("trimmed-5m-shredded.fasta","w+") as f:
-    for record in SeqIO.parse("trimmed-5m.fasta", "fasta"):
+with open(filename + '.shreaded',"w+") as f:
+    for record in SeqIO.parse(filename, "fasta"):
         ident = record.id
         sequence = record.seq
 

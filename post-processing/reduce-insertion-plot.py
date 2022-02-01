@@ -40,17 +40,15 @@ for i in range(0,int(numberOfInsertions)):
         else: newReverseInsertions[position]=newReverseInsertions[position]+1
 
 
-with open(filename + '.reduced','w+') as f:
-    for i in range(0,lineNumber):
-        if i in newForwardInsertions: f.write(str(newForwardInsertions[i]))
-        else: f.write('0')
 
-        f.write(' ')
+for i in range(0,lineNumber):
+    line=''
+    if i in newForwardInsertions: line = str(newForwardInsertions[i])
+    else: line = '0'
 
-        if i in newReverseInsertions: f.write(str(newReverseInsertions[i]))
-        else: f.write('0')
+    line = line + ' '
 
-        f.write('\n')
+    if i in newReverseInsertions: line = line + str(newReverseInsertions[i])
+    else: line = line + '0'
 
-    f.flush()
-    f.close()
+    print(line)

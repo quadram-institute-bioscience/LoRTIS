@@ -4,7 +4,7 @@ filename = sys.argv[1]
 
 threshold=3
 
-length_of_reference = 4631469
+length_of_reference =  int(sys.argv[2])
 #output_file = open(filename + '.corrected','w+')
 
 found_non_empty_line=False

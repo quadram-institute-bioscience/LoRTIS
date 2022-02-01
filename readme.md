@@ -1,6 +1,4 @@
-LoRTIS: A complete workflow from Nanopore sequencing FAST5 files, or Illumina short read FASTQ files, through to Tradis insertion 
-plot files.
-
+LoRTIS: A complete workflow to construct insertion plots from FASTQ sequencing data. Additionally, 10 pre/post processing utilities are provided which compliment transposon insertion analysis such as that performed by the main LoRTIS workflow or similar software such as Bio-Tradis https://github.com/sanger-pathogens/Bio-Tradis.
 
 # Prerequiste: Download the repository
 
@@ -30,7 +28,6 @@ sh short-reads.sh
 
 The workflow proceeds as in example 1 but short read mapping software is used.
 
-
 # Optional Utilities
 
 This is a collection of additional scripts which aid in the processing of data before and after the main workflow.
@@ -45,10 +42,17 @@ Where a subset of reads is required, for example to perform a like-for-like comp
 python3 shuffle-reads.py all-reads.fastq 10000 > all-reads.10000.fastq
 </pre>
 
+### Shread reads
+
+This takes as input a FASTA file of sequence data from long read sequencing and shreads the reads into short reads, the output file has a .shreaded extension.
+
+<pre>
+python3 shred-reads.py long-reads.fasta
+</Pre>
 
 ## Post-processing
 
-The following examples are based on an insertion plot called <b>a.insert_plot</a>, this should be replaced with your own file name such as <b>CP009273.1.insert_plot</b> which results from running the examples.
+The following examples are based on an insertion plot called <b>a.insert_plot</a>, this should be replaced with your own file name such as the <b>CP009273.1.insert_plot</b> file which results from running the examples.
 
 ### Change sign of insertions on the reverse strand of an insertion plot
 
@@ -84,8 +88,34 @@ Often genes, exist as part of operons rather than individually, this script is d
 python3 operons.py reference.embl > operons.txt
 </pre>
 
+### Reduce the insertion plot
+Insertion plots can have any number of insertions and this can make it difficult to compare like-for-like between experiments when there are a significantly different number of mutants. The following script makes a new file called 
 
-# 4. Explore the results
-Check plot files are correct, change the format e.g. second number is negative, launch Artemis, identify spikes and operons. Combine plot files e.g. different barcodes. Remove background noise (sites with 1 insertion set to 0).
+<pre>
+python3 reduce-insertion-plot.py a.insert_plot 1000 > a.1000.insert_plot
+</pre>
 
-reduce-insertion-plot.py takes as input an insertion plot and the number of insertions that you would like to keep and makes a new plot file with .reduced on the end of the name
+### Remove background insertions
+
+Occasionally sequencing data includes reads for transposons which are scattered throughout the genome and may correspond to dead or dying mutants. To clean up this background noise, a script is provided which masks sites where there are fewer than a given threshold of insertions by setting them to zero.
+
+<pre>
+python3 remove-background-insertions.py a.insert_plot 3 > a.bgremoved.insert_plot
+
+
+### Remove insertions after the end of the reference genome
+
+In our experience, the Bio-Tradis software can construct insertion plots which are longer than the reference genome and therefore cannot be loaded into Artemis. We do not find similar problems with our workflow. To overcome this problem a script is provided.
+
+<pre>
+python3 remove-insertions-after-end.py a.insert_plot 4631469 > a.corrected.insert_plot
+</pre>
+
+### Identify spikes
+
+Sometimes there are sites in the insertion plot with an unusually large numebr of insertions. Moreover, a number of those sites with a large number of insertions may be contigous to one another and form part of a larger 'spike'. To identify these spikes, a script is provided which lists the spikes in CSV format which is suitable for loading into a spreadsheet package.
+
+<pre>
+python3 spikes.py a.insert_plot
+</pre>
+
