@@ -8,6 +8,7 @@ plot files.
 git clone https://github.com/quadram-institute-bioscience/LoRTIS/
 </pre>
 
+# Main workflow
 
 ## Example 1: Long read FASTQ data to transposon insertion plot.
 <pre>
@@ -18,7 +19,7 @@ sh long-reads.sh
 
 This uses gzipped long read data in fastq format in a file called <b>long-reads.fq.gz</b>. Additionally, a reference genome in fasta format called <b>reference.fasta</b> is used to map the reads to. This example script will copy the input files into a Docker volume, run the workflow and then copy the results out into a directory called <b>results-lr</b>.
 
-The results can be viewed in Artemis with <b>File > Open</b> then select the reference.embl. Next, go to <b>Graph > Add User Plot</b> and select the relevant <b>.insert_plot</b> file.
+The results can be viewed in Artemis with <b>File > Open</b> then select the reference.embl. Next, go to <b>Graph > Add User Plot</b> and select the relevant <b>.insert_plot</b> file. Right clicking on the plot and selecting <b>scaling</b> allows more easy inspection of the insertions.
 
 ## Example 2: Short read FASTQ data to transposon insertion plot.
 <pre>
@@ -29,31 +30,59 @@ sh short-reads.sh
 
 The workflow proceeds as in example 1 but short read mapping software is used.
 
-# Optional: 1. Basecalling for Nanopore data
-This is performed using the Guppy basecaller, an example is provided in <b>pre-processing/basecalling.sh</b>
 
-# Optional: 2. Demultiplex and trim the reads for the transposon
-This uses QCat, which has been modified to search for the transposon sequence as listed in <b>simple_standard.yml</b>. The workflow can be run using pipeline.sh
+# Optional Utilities
 
-Run the preprocessing docker image (qcat, trim/flip reads)
-<b>Note: This typically takes 5-10 hours, most of this time is used by qcat</b>
+This is a collection of additional scripts which aid in the processing of data before and after the main workflow.
 
-# 3. Bio-Tradis with Minimap2
+## Pre-processing
 
-## 3.1. Short reads
+### Shuffle reads
 
-sudo docker run --rm -v $PWD:/source -v lortisvol:/data -w /source alpine cp reference.fasta short-reads.fq.gz /data
-sudo docker run --name lotris6 --mount source=lortisvol,target=/data martinclott/lortis:latest
+Where a subset of reads is required, for example to perform a like-for-like comparison between experiments, the shuffle-reads.py script can assist. For example, to obtain a random subset of 10,000 reads from a fastq file, the following command can be performed.
 
-short-reads.fq.gz
-
-reference.fasta
-
-sudo singularity build lortis.sif Singularity.def
-
-singularity run lortis.sif
+<pre>
+python3 shuffle-reads.py all-reads.fastq 10000 > all-reads.10000.fastq
+</pre>
 
 
+## Post-processing
+
+The following examples are based on an insertion plot called <b>a.insert_plot</a>, this should be replaced with your own file name such as <b>CP009273.1.insert_plot</b> which results from running the examples.
+
+### Change sign of insertions on the reverse strand of an insertion plot
+
+This changes the sign of the insertions on the reverse stran in an insertion plot from positive to negative. Consequently, the insertions on the negative strand are shown below the x axis in Artemis which makes them more distinguishable from those on the positive strand.
+
+<pre>
+python3 change-plot.py a.insert_plot > another.insert_plot
+</pre>
+
+
+### Combine insertion plots
+
+This takes as input two insertion plot files and creates a new plot file in which each site has the sum total of the insertions in the input plot files.
+
+<pre>
+python3 combine-plot-files.py a.insert_plot b.insert_plot > ab.insert_plot
+</pre>
+
+### List non-empty sites
+
+This takes as input an insertion plot and lists all sites which do not have any insertions.
+
+<pre>
+python3 list-non-empty-sites.py a.insert_plot
+</pre>
+
+
+### Find operons
+
+Often genes, exist as part of operons rather than individually, this script is designed to identifies such groups of genes.
+
+<pre>
+python3 operons.py reference.embl > operons.txt
+</pre>
 
 
 # 4. Explore the results
