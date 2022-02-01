@@ -1,6 +1,6 @@
 LoRTIS: A complete workflow to construct insertion plots from FASTQ sequencing data. Additionally, 10 pre/post processing utilities are provided which compliment transposon insertion analysis such as that performed by the main LoRTIS workflow or similar software such as Bio-Tradis https://github.com/sanger-pathogens/Bio-Tradis.
 
-# Prerequiste: Download the repository
+# Prerequisite: Download the repository
 
 <pre>
 git clone https://github.com/quadram-institute-bioscience/LoRTIS/
@@ -12,7 +12,7 @@ git clone https://github.com/quadram-institute-bioscience/LoRTIS/
 <pre>
 cd example
 sh long-reads.sh
-# Finally load the example.embl into Artemis and add user plot
+# Finally load the example.embl into Artemis, then add the insertion plot as described below.
 </pre>
 
 This uses gzipped long read data in fastq format in a file called <b>long-reads.fq.gz</b>. Additionally, a reference genome in fasta format called <b>reference.fasta</b> is used to map the reads to. This example script will copy the input files into a Docker volume, run the workflow and then copy the results out into a directory called <b>results-lr</b>.
@@ -23,14 +23,14 @@ The results can be viewed in Artemis with <b>File > Open</b> then select the ref
 <pre>
 cd example
 sh short-reads.sh
-# Finally load the example.embl into Artemis and add user plot
+# Finally load the example.embl into Artemis, then add the insertion plot as described above.
 </pre>
 
-The workflow proceeds as in example 1 but short read mapping software is used.
+The workflow proceeds as in example 1 but BWA is used rather than Minimap2 as the mapping software.
 
 # Optional Utilities
 
-This is a collection of additional scripts which aid in the processing of data before and after the main workflow.
+A collection of 10 utilities are provided to for processing of data before, and after, the main workflow.
 
 ## Pre-processing
 
@@ -52,7 +52,7 @@ python3 shred-reads.py long-reads.fasta
 
 ## Post-processing
 
-The following examples are based on an insertion plot called <b>a.insert_plot</a>, this should be replaced with your own file name such as the <b>CP009273.1.insert_plot</b> file which results from running the examples.
+The following examples are based on an insertion plot called <b>a.insert_plot</b>, this should be replaced with your own file name such as the <b>CP009273.1.insert_plot</b> file which results from running the examples.
 
 ### Change sign of insertions on the reverse strand of an insertion plot
 
@@ -101,7 +101,7 @@ Occasionally sequencing data includes reads for transposons which are scattered 
 
 <pre>
 python3 remove-background-insertions.py a.insert_plot 3 > a.bgremoved.insert_plot
-
+</pre>
 
 ### Remove insertions after the end of the reference genome
 
