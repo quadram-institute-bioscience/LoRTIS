@@ -1,5 +1,6 @@
 # An operon is a list of genes thrL, thrA, thrC are the same operon but but yaaX since yaaA is on the reverse strand
 # For now we can output the list of operons as a look up table.
+import sys
 from Bio import SeqIO
 
 gene2operon = dict()
@@ -13,7 +14,7 @@ gene2end = dict()
 lengthOfPrimeRegion=50
 
 
-for record in SeqIO.parse("/home/martin/Quadram/bio-tradis-data/cp009273.embl", "embl"):
+for record in SeqIO.parse(sys.argv[1], "embl"):
     print(record)
 
     features = record.features
