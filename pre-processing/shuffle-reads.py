@@ -23,6 +23,9 @@ random.shuffle(sequence_numbers)
 if len(sys.argv)>2: n_reads = int(sys.argv[2])
 else: n_reads = int(line_number/4)
 
+if n_reads> len(sequence_numbers):
+    print('You have requested ' + str(n_reads) + ' reads but the input file only has ' + str(len(sequence_numbers)))
+
 sequence_numbers_to_pick=set()
 for i in range(0,n_reads):
     sequence_numbers_to_pick.add(sequence_numbers[i])
