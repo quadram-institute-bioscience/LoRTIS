@@ -17,21 +17,20 @@ id2strand=dict()
 id2quality=dict()
 
 
-with open(filename) as f:
-    for line in f:
-        line_type = n%4
-        if line_type==0: ident = line.rstrip()
-        elif line_type==1:
-            sequence = line.rstrip()
-            id2sequence[ident] = sequence
-        elif line_type==2:
-            strand = line.rstrip()
-            id2strand[ident] = strand
-        elif line_type==3:
-            quality = line.rstrip()
-            id2quality[ident] = quality
-        
-        n=n+1
+for line in open(filename):
+    line_type = n%4
+    if line_type==0: ident = line.rstrip()
+    elif line_type==1:
+        sequence = line.rstrip()
+        id2sequence[ident] = sequence
+    elif line_type==2:
+        strand = line.rstrip()
+        id2strand[ident] = strand
+    elif line_type==3:
+        quality = line.rstrip()
+        id2quality[ident] = quality
+    
+    n=n+1
 
 if len(sys.argv)>2: n_reads = int(sys.argv[2])
 else: n_reads = n/4
