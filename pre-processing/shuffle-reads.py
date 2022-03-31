@@ -30,9 +30,9 @@ for i in range(0,n_reads):
 
 sequence_number=-1 # This will mean the first read is number zero as we add 1 when we read the first line
 
+n=0
 for line in open(filename):
     line_type = n%4
     if line_type==0: sequence_number=sequence_number+1
-
-    if sequence_number in sequence_numbers_to_pick:
-        print(line.rstrip())
+    if sequence_number in sequence_numbers_to_pick: print(line.rstrip())
+    n=n+1
