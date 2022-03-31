@@ -10,39 +10,29 @@ import random
 
 filename = sys.argv[1]
 
-n=0
+line_number=1
+for line in open(filename):
+    line_number=line_number+1
 
-id2sequence=dict()
-id2strand=dict()
-id2quality=dict()
+sequence_numbers=list()
+for i in range(0,int(line_number/4)):
+    sequence_numbers.append(i)
 
+random.shuffle(sequence_numbers)
+
+if len(sys.argv)>2: n_reads = int(sys.argv[2])
+else: n_reads = int(line_number/4)
+
+sequence_numbers_to_pick=set()
+for i in range(0,n_reads):
+    sequence_numbers_to_pick.add(sequence_numbers[i])
+
+
+sequence_number=-1 # This will mean the first read is number zero as we add 1 when we read the first line
 
 for line in open(filename):
     line_type = n%4
-    if line_type==0: ident = line.rstrip()
-    elif line_type==1:
-        sequence = line.rstrip()
-        id2sequence[ident] = sequence
-    elif line_type==2:
-        strand = line.rstrip()
-        id2strand[ident] = strand
-    elif line_type==3:
-        quality = line.rstrip()
-        id2quality[ident] = quality
-    
-    n=n+1
+    if line_type==0: sequence_number=sequence_number+1
 
-if len(sys.argv)>2: n_reads = int(sys.argv[2])
-else: n_reads = n/4
-
-keylist = list(id2sequence.keys())
-
-random.shuffle(keylist)
-    
-
-for i in range(0,n_reads):
-    key = keylist[i]
-    print(key)
-    print(id2sequence[key])
-    print(id2strand[key])
-    print(id2quality[key])
+    if sequence_number in sequence_numbers_to_pick:
+        print(line.rstrip())
