@@ -18,7 +18,7 @@ id2quality=dict()
 
 
 with open(filename) as f:
-    for line in f.readlines():
+    for line in f:
         line_type = n%4
         if line_type==0: ident = line.rstrip()
         elif line_type==1:
