@@ -1,4 +1,4 @@
-LoRTIS: A complete workflow to construct insertion plots from FASTQ sequencing data. Additionally, 10 pre/post processing utilities are provided which compliment transposon insertion analysis such as that performed by the main LoRTIS workflow or similar software such as Bio-Tradis https://github.com/sanger-pathogens/Bio-Tradis.
+LoRTIS: A complete workflow to construct insertion plots from FASTQ sequencing data. The software is released under GNU General Public License v3, as described at https://www.gnu.org/licenses/gpl-3.0.html. Additionally, 10 pre/post processing utilities are provided which compliment transposon insertion analysis such as that performed by the main LoRTIS workflow or similar software such as Bio-Tradis https://github.com/sanger-pathogens/Bio-Tradis.
 
 # Prerequisite: Download the repository
 
